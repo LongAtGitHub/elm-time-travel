@@ -23,7 +23,7 @@ viewWithTimeTravel rawGame computer model =
   let
     helpMessage =
         if model.paused then
-          "Press R to resume"
+          "Press R to resume. You can also drag mouse to time travel"
         else
           "Press T to time travel"
     historyBar color opacity index =
