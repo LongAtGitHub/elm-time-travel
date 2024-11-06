@@ -45,23 +45,31 @@ viewWithTimeTravel rawGame computer model =
       ]
 
 updateWithTimeTravel rawGame computer model =
-    if (model.paused ) && ( computer.mouse.down ) then
     let 
         newPlaybackPosition = min (mousePosToHistoryIndex computer) (List.length model.history)
+        replayHistory pastInputs = List.foldl rawGame.updateState rawGame.initialState pastInputs
     in
+    if (model.paused) && (computer.mouse.down) then
         { model
         | historyPlaybackPosition = newPlaybackPosition
+        , rawModel = replayHistory (List.take newPlaybackPosition model.history)
         }
-    else
     
-    if keyPressed "T" computer then
+    else if keyPressed "T" computer then
         { model | paused = True }
+    
     else if keyPressed "R" computer then
-        { model | paused = False }
+        { model | paused = False, history = List.take newPlaybackPosition model.history }
+    
     else if model.paused then
         model
+    
     else
-        { model | rawModel = rawGame.updateState computer model.rawModel, history= model.history ++[computer], historyPlaybackPosition = List.length model.history+1 }
+        { model
+        | rawModel = rawGame.updateState computer model.rawModel
+        , history = model.history ++ [computer]
+        , historyPlaybackPosition = List.length model.history + 1
+        }
 
 -- Converts an index in the history list to an x coordinate on the screen
 historyIndexToX computer index =
